@@ -11,7 +11,6 @@ import lombok.Data;
 public class OrdersItem {
     @Id
     private Long id;
-    private Long orderId;
     private Long itemId;
     private int quantity;
     @ManyToOne
