@@ -1,16 +1,18 @@
 package org.example.bakery.Model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
+import java.util.List;
+
+@Data
 @Entity
 //@Table(name = "orders")
 public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "menu_id")
-    private MenuItem itemId;
-    private int  quantity;
-    private double total;
+    private Double total;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrdersItem> items;
 }

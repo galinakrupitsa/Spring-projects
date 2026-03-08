@@ -1,7 +1,12 @@
 package org.example.bakery.Service;
 
+import org.example.bakery.DTO.MenuResponseDTO;
 import org.example.bakery.Repository.BakeryRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import org.example.bakery.Model.MenuItem;
 
 @Service
 public class BakeryService {
@@ -9,4 +14,17 @@ public class BakeryService {
     public BakeryService(BakeryRepository bakeryRepository) {
         this.bakeryRepository = bakeryRepository;
     }
+
+    public List<MenuResponseDTO> showAll() {
+        List<MenuResponseDTO> menu = new ArrayList<>();
+        for (MenuItem item : bakeryRepository.findAll()) {
+            MenuResponseDTO dtomenu = new MenuResponseDTO();
+            dtomenu.setName(item.getName());
+            dtomenu.setPrice(item.getPrice());
+            menu.add(dtomenu);
+        }
+        return menu;
+    }
+
+
 }
