@@ -1,19 +1,23 @@
 package org.example.bakery.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Data;
-
-@Entity
 @Data
+@Entity
+@Table(name = "orders_item")
 public class OrdersItem {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long itemId;
-    private int quantity;
+
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Orders order;
+
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private MenuItem item;
+
+    private int quantity;
 }
