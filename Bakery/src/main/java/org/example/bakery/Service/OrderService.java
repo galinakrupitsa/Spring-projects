@@ -9,6 +9,7 @@ import org.example.bakery.Model.Orders;
 import org.example.bakery.Model.OrdersItem;
 import org.example.bakery.Repository.BakeryRepository;
 import org.example.bakery.Repository.OrderRepository;
+import org.example.bakery.Repository.StoreRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,9 +19,11 @@ import java.util.List;
 public class OrderService {
     public final OrderRepository orderRepository;
     public final BakeryRepository bakeryRepository;
-    public OrderService(OrderRepository orderRepository, BakeryRepository bakeryRepository) {
+    public final StoreRepository storeRepository;
+    public OrderService(OrderRepository orderRepository, BakeryRepository bakeryRepository, StoreRepository storeRepository) {
         this.orderRepository = orderRepository;
         this.bakeryRepository = bakeryRepository;
+        this.storeRepository = storeRepository;
     }
 
     public OrderResponseDTO createOrder(OrderDTO dto) {
@@ -30,9 +33,7 @@ public class OrderService {
         double total = 0;
 
         for (OrdersItemDTO itemDTO : dto.getOrdersItems()) {
-
             int quantity = itemDTO.getQuantity();
-
             MenuItem menuItem = bakeryRepository
                     .findById(itemDTO.getId())
                     .orElseThrow();
@@ -41,7 +42,6 @@ public class OrderService {
             item.setOrder(order);          // связь с заказом
             item.setItem(menuItem);        // товар
             item.setQuantity(quantity);    // количество
-
             total += menuItem.getPrice() * quantity;
 
             orderItems.add(item);
