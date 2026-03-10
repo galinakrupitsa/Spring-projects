@@ -20,10 +20,12 @@ public class OrderService {
     public final OrderRepository orderRepository;
     public final BakeryRepository bakeryRepository;
     public final StoreRepository storeRepository;
-    public OrderService(OrderRepository orderRepository, BakeryRepository bakeryRepository, StoreRepository storeRepository) {
+    public final StoreService storeService;
+    public OrderService(OrderRepository orderRepository, BakeryRepository bakeryRepository, StoreRepository storeRepository, StoreService storeService) {
         this.orderRepository = orderRepository;
         this.bakeryRepository = bakeryRepository;
         this.storeRepository = storeRepository;
+        this.storeService = storeService;
     }
 
     public OrderResponseDTO createOrder(OrderDTO dto) {
@@ -45,6 +47,7 @@ public class OrderService {
             total += menuItem.getPrice() * quantity;
 
             orderItems.add(item);
+            storeService.decreaseQuantity(menuItem.getId(),quantity);
         }
 
         order.setItems(orderItems);

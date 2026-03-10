@@ -14,9 +14,19 @@ public class StoreService {
 
     public StoreService(StoreRepository storeRepository, OrderRepository orderRepository, BakeryRepository bakeryRepository) {
         this.storeRepository = storeRepository;
-
     }
    public List<Store> showAll(){
         return storeRepository.findAllWithItems();
+   }
+   public void decreaseQuantity(Long itemId, int amount){
+        Store store = storeRepository.findByItemId(itemId);
+        if(store == null){
+            throw new RuntimeException("MenuItem not found");
+        }
+        if(store.getAvailableQuantity() < amount){
+            throw new RuntimeException("Sorry, Not enough stock");
+        }
+        store.setAvailableQuantity(store.getAvailableQuantity() - amount);
+        storeRepository.save(store);
    }
 }
