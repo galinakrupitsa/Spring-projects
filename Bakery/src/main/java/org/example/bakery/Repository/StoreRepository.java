@@ -8,4 +8,6 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     @Query("SELECT s FROM Store s JOIN FETCH s.item")
     List<Store> findAllWithItems();
     Store findByItemId(Long itemId);
+
 }
+
