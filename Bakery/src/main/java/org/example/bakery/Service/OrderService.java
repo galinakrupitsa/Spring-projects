@@ -5,10 +5,12 @@ import org.example.bakery.DTO.OrderDTO;
 
 import org.example.bakery.DTO.OrderResponseDTO;
 import org.example.bakery.DTO.OrdersItemDTO;
+import org.example.bakery.Model.Customer;
 import org.example.bakery.Model.MenuItem;
 import org.example.bakery.Model.Orders;
 import org.example.bakery.Model.OrdersItem;
 import org.example.bakery.Repository.BakeryRepository;
+import org.example.bakery.Repository.CustomerRepository;
 import org.example.bakery.Repository.OrderRepository;
 import org.example.bakery.Repository.StoreRepository;
 import org.springframework.stereotype.Service;
@@ -22,52 +24,74 @@ public class OrderService {
     public final BakeryRepository bakeryRepository;
     public final StoreRepository storeRepository;
     public final StoreService storeService;
-    public OrderService(OrderRepository orderRepository, BakeryRepository bakeryRepository, StoreRepository storeRepository, StoreService storeService) {
+    public final CustomerRepository customerRepository;
+
+    public OrderService(OrderRepository orderRepository, BakeryRepository bakeryRepository, StoreRepository storeRepository, StoreService storeService, CustomerRepository customerRepository) {
         this.orderRepository = orderRepository;
         this.bakeryRepository = bakeryRepository;
         this.storeRepository = storeRepository;
         this.storeService = storeService;
+        this.customerRepository = customerRepository;
     }
 
     public OrderResponseDTO createOrder(OrderDTO dto) {
+        // ищем клиента
+        List<Customer> customers = customerRepository.findAll();
+        Customer customer = null;
+        for (Customer c : customers) {
+            if (c.getName().equalsIgnoreCase(dto.getName()) && c.getGender().equalsIgnoreCase(dto.getGender())) {
+                customer = c;
+                break;
+            }
+        }
+// Если клиент не найден, создаем нового
+            if (customer == null) {
+                Customer newCustomer = new Customer();
+                newCustomer.setName(dto.getName());
+                newCustomer.setGender(dto.getGender());
+                customer = customerRepository.save(newCustomer);
+            }
+        // создаем заказ
+            Orders order = new Orders();
+            order.setCustomer(customer);
+            List<OrdersItem> orderItems = new ArrayList<>();
+            double total = 0;
 
-        Orders order = new Orders();
-        List<OrdersItem> orderItems = new ArrayList<>();
-        double total = 0;
+            for (OrdersItemDTO itemDTO : dto.getOrdersItems()) {
+                int quantity = itemDTO.getQuantity();
+                MenuItem menuItem = bakeryRepository
+                        .findById(itemDTO.getId())
+                        .orElseThrow();
 
-        for (OrdersItemDTO itemDTO : dto.getOrdersItems()) {
-            int quantity = itemDTO.getQuantity();
-            MenuItem menuItem = bakeryRepository
-                    .findById(itemDTO.getId())
-                    .orElseThrow();
+                OrdersItem item = new OrdersItem();
+                item.setOrder(order);          // связь с заказом
+                item.setItem(menuItem);        // товар
+                item.setQuantity(quantity);    // количество
+                total += menuItem.getPrice() * quantity;
 
-            OrdersItem item = new OrdersItem();
-            item.setOrder(order);          // связь с заказом
-            item.setItem(menuItem);        // товар
-            item.setQuantity(quantity);    // количество
-            total += menuItem.getPrice() * quantity;
+                orderItems.add(item);
+                storeService.decreaseQuantity(menuItem.getId(), quantity);
+            }
 
-            orderItems.add(item);
-            storeService.decreaseQuantity(menuItem.getId(),quantity);
+            order.setItems(orderItems);
+            order.setTotal(total);
+
+            Orders savedOrder = orderRepository.save(order);
+
+            OrderResponseDTO response = new OrderResponseDTO();
+            response.setOrderId(savedOrder.getId());
+            response.setTotal(savedOrder.getTotal());
+            return response;
         }
 
-        order.setItems(orderItems);
-        order.setTotal(total);
 
-        Orders savedOrder = orderRepository.save(order);
-
-        OrderResponseDTO response = new OrderResponseDTO();
-        response.setOrderId(savedOrder.getId());
-        response.setTotal(savedOrder.getTotal());
-
-        return response;
-    }
-    public Double getSumAll(){
-        List<Orders> orders = orderRepository.findAll();
-        double total = 0;
-        for(Orders order : orders){
-            total = total+ order.getTotal();
+    public Double getSumAll() {
+            List<Orders> orders = orderRepository.findAll();
+            double total = 0;
+            for (Orders order : orders) {
+                total = total + order.getTotal();
+            }
+            return total;
         }
-        return total;
-    }
+
 }

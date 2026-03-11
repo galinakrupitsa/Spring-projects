@@ -15,4 +15,7 @@ public class Orders {
     private Double total;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrdersItem> items;
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 }

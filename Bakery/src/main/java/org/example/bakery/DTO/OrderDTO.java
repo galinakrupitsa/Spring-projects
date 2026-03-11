@@ -8,4 +8,6 @@ import java.util.List;
 @Data
 public class OrderDTO {
     private List<OrdersItemDTO> ordersItems = new ArrayList<>();
+    private String name;
+    private String gender;
 }
