@@ -1,5 +1,6 @@
 package org.example.bakery.Service;
 
+import jakarta.persistence.criteria.Order;
 import org.example.bakery.DTO.OrderDTO;
 
 import org.example.bakery.DTO.OrderResponseDTO;
@@ -60,5 +61,13 @@ public class OrderService {
         response.setTotal(savedOrder.getTotal());
 
         return response;
+    }
+    public Double getSumAll(){
+        List<Orders> orders = orderRepository.findAll();
+        double total = 0;
+        for(Orders order : orders){
+            total = total+ order.getTotal();
+        }
+        return total;
     }
 }
