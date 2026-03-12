@@ -15,6 +15,8 @@ import org.example.bakery.Repository.OrderRepository;
 import org.example.bakery.Repository.StoreRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,12 +79,14 @@ public class OrderService {
 
             order.setItems(orderItems);
             order.setTotal(total);
+            order.setCreatedAt(LocalDate.now());
 
             Orders savedOrder = orderRepository.save(order);
 
             OrderResponseDTO response = new OrderResponseDTO();
             response.setOrderId(savedOrder.getId());
             response.setTotal(savedOrder.getTotal());
+            response.setOrderDate(savedOrder.getCreatedAt());
             return response;
         }
 
@@ -112,5 +116,12 @@ public class OrderService {
             }
         }
         return result;
+    }
+    public long getCount() {
+        return  orderRepository.count();
+    }
+    public List<Orders> getTodayOrders() {
+        LocalDate today = LocalDate.now();
+        return orderRepository.findByCreatedAt(today);
     }
 }
