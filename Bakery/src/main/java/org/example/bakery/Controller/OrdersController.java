@@ -5,6 +5,8 @@ import org.example.bakery.DTO.OrderResponseDTO;
 import org.example.bakery.Service.OrderService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1")
 public class OrdersController {
@@ -19,5 +21,9 @@ public class OrdersController {
     @GetMapping("/sum")
     public double totalBakerySum(){
         return orderService.getSumAll();
+    }
+    @GetMapping("/top")
+    public Map<String, Integer> getTop(){
+        return orderService.getTopItems();
     }
 }

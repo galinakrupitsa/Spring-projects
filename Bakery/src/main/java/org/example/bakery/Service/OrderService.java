@@ -16,7 +16,9 @@ import org.example.bakery.Repository.StoreRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class OrderService {
@@ -93,5 +95,22 @@ public class OrderService {
             }
             return total;
         }
-
+    public Map<String,Integer> getTopItems(){
+        List<Orders> orders = orderRepository.findAll();
+        Map<String,Integer> result = new HashMap<>();
+        for (Orders order : orders) {
+            List<OrdersItem> items = order.getItems();
+            for (OrdersItem item : items) {
+                String itemName = item.getItem().getName();
+                int quantity = item.getQuantity();
+                if (result.containsKey(itemName)) {
+                    int current = result.get(itemName);
+                    result.put(itemName, current + quantity);
+                } else {
+                    result.put(itemName, quantity);
+                }
+            }
+        }
+        return result;
+    }
 }
