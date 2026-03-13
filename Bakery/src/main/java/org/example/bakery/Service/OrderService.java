@@ -4,6 +4,7 @@ import jakarta.persistence.criteria.Order;
 import org.example.bakery.DTO.OrderDTO;
 
 import org.example.bakery.DTO.OrderResponseDTO;
+import org.example.bakery.DTO.OrderResponseTodayDTO;
 import org.example.bakery.DTO.OrdersItemDTO;
 import org.example.bakery.Model.Customer;
 import org.example.bakery.Model.MenuItem;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -120,8 +122,32 @@ public class OrderService {
     public long getCount() {
         return  orderRepository.count();
     }
-    public List<Orders> getTodayOrders() {
+    public List<OrderResponseTodayDTO> getTodayOrders() {
         LocalDate today = LocalDate.now();
-        return orderRepository.findByCreatedAt(today);
+        List<Orders> orders = orderRepository.findAll();
+        List<OrderResponseTodayDTO> responses = new ArrayList<>();
+
+        for (Orders order : orders) {
+            if (order.getCreatedAt().equals(today)){
+                OrderResponseTodayDTO response = new OrderResponseTodayDTO();
+                response.setId(order.getId());
+                response.setTotal(order.getTotal());
+                response.setDate(order.getCreatedAt());
+                responses.add(response);
+            }
+        }
+            return responses;
+    }
+    public List<OrderResponseTodayDTO> getDayOrders(LocalDate date) {
+        List<Orders> orders = orderRepository.findByCreatedAt(date);
+        List<OrderResponseTodayDTO> responses = new ArrayList<>();
+        for (Orders order : orders) {
+            OrderResponseTodayDTO response = new OrderResponseTodayDTO();
+            response.setId(order.getId());
+            response.setTotal(order.getTotal());
+            response.setDate(order.getCreatedAt());
+            responses.add(response);
+        }
+        return responses;
     }
 }

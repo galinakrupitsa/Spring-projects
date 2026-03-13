@@ -2,10 +2,12 @@ package org.example.bakery.Controller;
 
 import org.example.bakery.DTO.OrderDTO;
 import org.example.bakery.DTO.OrderResponseDTO;
+import org.example.bakery.DTO.OrderResponseTodayDTO;
 import org.example.bakery.Model.Orders;
 import org.example.bakery.Service.OrderService;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +36,11 @@ public class OrdersController {
         return orderService.getCount();
     }
     @GetMapping("/today")
-    public List<Orders> getTodayOrders(){
+    public List<OrderResponseTodayDTO> getTodayOrders(){
         return orderService.getTodayOrders();
+    }
+    @GetMapping("/date/{date}")
+    public List<OrderResponseTodayDTO> getTodayOrders(@PathVariable LocalDate date){
+        return orderService.getDayOrders(date);
     }
 }
