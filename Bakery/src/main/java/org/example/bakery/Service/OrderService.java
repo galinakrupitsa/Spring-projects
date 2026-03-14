@@ -6,6 +6,7 @@ import org.example.bakery.DTO.OrderDTO;
 import org.example.bakery.DTO.OrderResponseDTO;
 import org.example.bakery.DTO.OrderResponseTodayDTO;
 import org.example.bakery.DTO.OrdersItemDTO;
+import org.example.bakery.Exception.ItemNotFoundException;
 import org.example.bakery.Model.Customer;
 import org.example.bakery.Model.MenuItem;
 import org.example.bakery.Model.Orders;
@@ -17,8 +18,6 @@ import org.example.bakery.Repository.StoreRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,13 +66,22 @@ public class OrderService {
                 int quantity = itemDTO.getQuantity();
                 MenuItem menuItem = bakeryRepository
                         .findById(itemDTO.getId())
-                        .orElseThrow();
+                        .orElseThrow(() -> new ItemNotFoundException(
+                        "Menu item with id " + itemDTO.getId() + " not found"
+                ));
 
                 OrdersItem item = new OrdersItem();
                 item.setOrder(order);          // связь с заказом
                 item.setItem(menuItem);        // товар
-                item.setQuantity(quantity);    // количество
-                total += menuItem.getPrice() * quantity;
+                item.setQuantity(quantity);   // количество
+                double price = menuItem.getPrice();
+                    if  (customer.getGender().equalsIgnoreCase("female")&&
+                        (menuItem.getName().equalsIgnoreCase("Cruassant"))||
+                        (menuItem.getName().equalsIgnoreCase("americano"))){
+                        price = 0.5*price;
+                }
+
+                total += price * quantity;
 
                 orderItems.add(item);
                 storeService.decreaseQuantity(menuItem.getId(), quantity);
@@ -150,4 +158,5 @@ public class OrderService {
         }
         return responses;
     }
+
 }

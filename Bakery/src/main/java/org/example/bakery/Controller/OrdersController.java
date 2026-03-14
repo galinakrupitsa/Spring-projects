@@ -5,6 +5,7 @@ import org.example.bakery.DTO.OrderResponseDTO;
 import org.example.bakery.DTO.OrderResponseTodayDTO;
 import org.example.bakery.Model.Orders;
 import org.example.bakery.Service.OrderService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -40,7 +41,11 @@ public class OrdersController {
         return orderService.getTodayOrders();
     }
     @GetMapping("/date/{date}")
-    public List<OrderResponseTodayDTO> getTodayOrders(@PathVariable LocalDate date){
+    public List<OrderResponseTodayDTO> getTodayOrders(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd")LocalDate date){
         return orderService.getDayOrders(date);
     }
+//    @PostMapping("/womansDiscount")
+//    public List<OrderResponseDTO> getWomansDiscount(@RequestBody OrderDTO dto){
+//        return orderService.createDiscountOrder(dto);
+//    }
 }

@@ -1,6 +1,8 @@
 package org.example.bakery.Service;
 
 import org.example.bakery.DTO.StoreItemDTO;
+import org.example.bakery.Exception.ItemNotFoundException;
+import org.example.bakery.Exception.NotEnoughStockException;
 import org.example.bakery.Model.Store;
 import org.example.bakery.Repository.BakeryRepository;
 import org.example.bakery.Repository.OrderRepository;
@@ -22,10 +24,10 @@ public class StoreService {
    public void decreaseQuantity(Long itemId, int amount){
         Store store = storeRepository.findByItemId(itemId);
         if(store == null){
-            throw new RuntimeException("MenuItem not found");
+            throw new ItemNotFoundException("MenuItem" + itemId + " not found");
         }
         if(store.getAvailableQuantity() < amount){
-            throw new RuntimeException("Sorry, Not enough stock");
+            throw new NotEnoughStockException("Sorry, Not enough stock for item id " + itemId);
         }
         store.setAvailableQuantity(store.getAvailableQuantity() - amount);
         storeRepository.save(store);
