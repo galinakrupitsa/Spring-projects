@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Orders, Long> {
     List<Orders> findByCreatedAt(LocalDate date);
+    List<Orders> findByCustomerId(Long customerId);
 
 }

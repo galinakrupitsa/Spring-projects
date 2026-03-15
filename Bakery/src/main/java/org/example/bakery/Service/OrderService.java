@@ -158,5 +158,26 @@ public class OrderService {
         }
         return responses;
     }
+    public List<OrderResponseDTO> getOrdersByCustomerId(Long customerId) {
+        List<Orders> orders = orderRepository.findByCustomerId(customerId);
+        List<OrderResponseDTO> responses = new ArrayList<>();
+        for (Orders order : orders) {
+            OrderResponseDTO response = new OrderResponseDTO();
+            response.setOrderId(order.getId());
+            response.setTotal(order.getTotal());
+            response.setOrderDate(order.getCreatedAt());
+            responses.add(response);
+        }
+        return responses;
+    }
+
+    public int getTotalById(Long customerId) {
+        int total = 0;
+        List<OrderResponseDTO> orders = getOrdersByCustomerId(customerId);
+        for (OrderResponseDTO order : orders) {
+            total += order.getTotal();
+        }
+        return total;
+    }
 
 }
