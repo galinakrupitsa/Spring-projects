@@ -1,5 +1,6 @@
 package org.example.bakery.Service;
 
+import org.example.bakery.DTO.ItemsDTO;
 import org.example.bakery.DTO.StoreItemDTO;
 import org.example.bakery.Exception.ItemNotFoundException;
 import org.example.bakery.Exception.NotEnoughStockException;
@@ -9,6 +10,7 @@ import org.example.bakery.Repository.OrderRepository;
 import org.example.bakery.Repository.StoreRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,6 +37,18 @@ public class StoreService {
     public StoreItemDTO findById(Long id){
         Store store = storeRepository.findById(id).orElse(null);
         return new StoreItemDTO(store.getItem().getName(), store.getAvailableQuantity());
-
+    }
+    public List<ItemsDTO> getLowStock(){
+        List<Store> stores = storeRepository.findAll();
+        List<ItemsDTO> result = new ArrayList<>();
+        for(Store store : stores){
+            if(store.getAvailableQuantity()<=5){
+                ItemsDTO dto = new ItemsDTO();
+                dto.setName(store.getItem().getName());
+                dto.setQuantity(store.getAvailableQuantity());
+                result.add(dto);
+            }
+        }
+        return result;
     }
 }

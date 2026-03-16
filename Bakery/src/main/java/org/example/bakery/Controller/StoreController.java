@@ -1,5 +1,6 @@
 package org.example.bakery.Controller;
 
+import org.example.bakery.DTO.ItemsDTO;
 import org.example.bakery.DTO.StoreItemDTO;
 import org.example.bakery.Model.Store;
 import org.example.bakery.Service.StoreService;
@@ -24,5 +25,9 @@ public class StoreController {
     @GetMapping("/store/id/{id}")
     public StoreItemDTO findByStoreId(@PathVariable Long id){
         return storeService.findById(id);
+    }
+    @GetMapping("/store/lowstock")
+    public List<ItemsDTO> findByLowStock(){
+        return storeService.getLowStock();
     }
 }
