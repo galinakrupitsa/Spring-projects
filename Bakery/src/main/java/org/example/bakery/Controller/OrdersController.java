@@ -54,4 +54,8 @@ public class OrdersController {
     public List<ItemsDTO> getItemsToday(@PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
         return orderService.getItemsToday(date);
     }
+    @GetMapping("/orders/bestDay")
+    public BestDayDTO getBestDay(){
+        return orderService.getBestDay();
+    }
 }

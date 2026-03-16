@@ -206,5 +206,22 @@ public class OrderService {
         }
             return itemsToday;
         }
-
+public BestDayDTO getBestDay() {
+    List<Orders> orders = orderRepository.findAll();
+    Map<LocalDate, Double> revenuePerDay = new HashMap<>();
+    for (Orders order : orders) {
+        LocalDate date = order.getCreatedAt();
+        double total = order.getTotal();
+        revenuePerDay.put(date, revenuePerDay.getOrDefault(date, 0.0) + total);
+    }
+    LocalDate bestDate = null;
+    double maxRevenue = 0;
+    for (Map.Entry<LocalDate, Double> entry : revenuePerDay.entrySet()) {
+        if (entry.getValue() > maxRevenue) {
+            maxRevenue = entry.getValue();
+            bestDate = entry.getKey();
+        }
+    }
+        return new BestDayDTO(bestDate, maxRevenue);
+}
 }
