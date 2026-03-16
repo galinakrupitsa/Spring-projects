@@ -1,11 +1,8 @@
 package org.example.bakery.Service;
 
 import jakarta.persistence.criteria.Order;
-import org.example.bakery.DTO.OrderDTO;
+import org.example.bakery.DTO.*;
 
-import org.example.bakery.DTO.OrderResponseDTO;
-import org.example.bakery.DTO.OrderResponseTodayDTO;
-import org.example.bakery.DTO.OrdersItemDTO;
 import org.example.bakery.Exception.ItemNotFoundException;
 import org.example.bakery.Model.Customer;
 import org.example.bakery.Model.MenuItem;
@@ -50,68 +47,69 @@ public class OrderService {
             }
         }
 // Если клиент не найден, создаем нового
-            if (customer == null) {
-                Customer newCustomer = new Customer();
-                newCustomer.setName(dto.getName());
-                newCustomer.setGender(dto.getGender());
-                customer = customerRepository.save(newCustomer);
-            }
-        // создаем заказ
-            Orders order = new Orders();
-            order.setCustomer(customer);
-            List<OrdersItem> orderItems = new ArrayList<>();
-            double total = 0;
-
-            for (OrdersItemDTO itemDTO : dto.getOrdersItems()) {
-                int quantity = itemDTO.getQuantity();
-                MenuItem menuItem = bakeryRepository
-                        .findById(itemDTO.getId())
-                        .orElseThrow(() -> new ItemNotFoundException(
-                        "Menu item with id " + itemDTO.getId() + " not found"
-                ));
-
-                OrdersItem item = new OrdersItem();
-                item.setOrder(order);          // связь с заказом
-                item.setItem(menuItem);        // товар
-                item.setQuantity(quantity);   // количество
-                double price = menuItem.getPrice();
-                    if  (customer.getGender().equalsIgnoreCase("female")&&
-                        (menuItem.getName().equalsIgnoreCase("Cruassant"))||
-                        (menuItem.getName().equalsIgnoreCase("americano"))){
-                        price = 0.5*price;
-                }
-
-                total += price * quantity;
-
-                orderItems.add(item);
-                storeService.decreaseQuantity(menuItem.getId(), quantity);
-            }
-
-            order.setItems(orderItems);
-            order.setTotal(total);
-            order.setCreatedAt(LocalDate.now());
-
-            Orders savedOrder = orderRepository.save(order);
-
-            OrderResponseDTO response = new OrderResponseDTO();
-            response.setOrderId(savedOrder.getId());
-            response.setTotal(savedOrder.getTotal());
-            response.setOrderDate(savedOrder.getCreatedAt());
-            return response;
+        if (customer == null) {
+            Customer newCustomer = new Customer();
+            newCustomer.setName(dto.getName());
+            newCustomer.setGender(dto.getGender());
+            customer = customerRepository.save(newCustomer);
         }
+        // создаем заказ
+        Orders order = new Orders();
+        order.setCustomer(customer);
+        List<OrdersItem> orderItems = new ArrayList<>();
+        double total = 0;
+
+        for (OrdersItemDTO itemDTO : dto.getOrdersItems()) {
+            int quantity = itemDTO.getQuantity();
+            MenuItem menuItem = bakeryRepository
+                    .findById(itemDTO.getId())
+                    .orElseThrow(() -> new ItemNotFoundException(
+                            "Menu item with id " + itemDTO.getId() + " not found"
+                    ));
+
+            OrdersItem item = new OrdersItem();
+            item.setOrder(order);          // связь с заказом
+            item.setItem(menuItem);        // товар
+            item.setQuantity(quantity);   // количество
+            double price = menuItem.getPrice();
+            if (customer.getGender().equalsIgnoreCase("female") &&
+                    (menuItem.getName().equalsIgnoreCase("Cruassant")) ||
+                    (menuItem.getName().equalsIgnoreCase("americano"))) {
+                price = 0.5 * price;
+            }
+
+            total += price * quantity;
+
+            orderItems.add(item);
+            storeService.decreaseQuantity(menuItem.getId(), quantity);
+        }
+
+        order.setItems(orderItems);
+        order.setTotal(total);
+        order.setCreatedAt(LocalDate.now());
+
+        Orders savedOrder = orderRepository.save(order);
+
+        OrderResponseDTO response = new OrderResponseDTO();
+        response.setOrderId(savedOrder.getId());
+        response.setTotal(savedOrder.getTotal());
+        response.setOrderDate(savedOrder.getCreatedAt());
+        return response;
+    }
 
 
     public Double getSumAll() {
-            List<Orders> orders = orderRepository.findAll();
-            double total = 0;
-            for (Orders order : orders) {
-                total = total + order.getTotal();
-            }
-            return total;
-        }
-    public Map<String,Integer> getTopItems(){
         List<Orders> orders = orderRepository.findAll();
-        Map<String,Integer> result = new HashMap<>();
+        double total = 0;
+        for (Orders order : orders) {
+            total = total + order.getTotal();
+        }
+        return total;
+    }
+
+    public Map<String, Integer> getTopItems() {
+        List<Orders> orders = orderRepository.findAll();
+        Map<String, Integer> result = new HashMap<>();
         for (Orders order : orders) {
             List<OrdersItem> items = order.getItems();
             for (OrdersItem item : items) {
@@ -127,16 +125,18 @@ public class OrderService {
         }
         return result;
     }
+
     public long getCount() {
-        return  orderRepository.count();
+        return orderRepository.count();
     }
+
     public List<OrderResponseTodayDTO> getTodayOrders() {
         LocalDate today = LocalDate.now();
         List<Orders> orders = orderRepository.findAll();
         List<OrderResponseTodayDTO> responses = new ArrayList<>();
 
         for (Orders order : orders) {
-            if (order.getCreatedAt().equals(today)){
+            if (order.getCreatedAt().equals(today)) {
                 OrderResponseTodayDTO response = new OrderResponseTodayDTO();
                 response.setId(order.getId());
                 response.setTotal(order.getTotal());
@@ -144,8 +144,9 @@ public class OrderService {
                 responses.add(response);
             }
         }
-            return responses;
+        return responses;
     }
+
     public List<OrderResponseTodayDTO> getDayOrders(LocalDate date) {
         List<Orders> orders = orderRepository.findByCreatedAt(date);
         List<OrderResponseTodayDTO> responses = new ArrayList<>();
@@ -158,6 +159,7 @@ public class OrderService {
         }
         return responses;
     }
+
     public List<OrderResponseDTO> getOrdersByCustomerId(Long customerId) {
         List<Orders> orders = orderRepository.findByCustomerId(customerId);
         List<OrderResponseDTO> responses = new ArrayList<>();
@@ -179,5 +181,30 @@ public class OrderService {
         }
         return total;
     }
+
+    public List<ItemsDTO> getItemsToday(LocalDate date) {
+        Map<String, Integer> counter = new HashMap<>();
+
+        List<Orders> orders = orderRepository.findByCreatedAt(date);
+        for (Orders order : orders) {
+            List<OrdersItem> items = order.getItems();
+            for (OrdersItem i : items) {
+
+                String name = i.getItem().getName();
+                Integer quantity = i.getQuantity();
+                counter.put(name, counter.getOrDefault(name, 0) + quantity);
+            }
+        }
+        List<ItemsDTO> itemsToday = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : counter.entrySet()) {
+
+            ItemsDTO dto = new ItemsDTO();
+            dto.setName(entry.getKey());
+            dto.setQuantity(entry.getValue());
+
+            itemsToday.add(dto);
+        }
+            return itemsToday;
+        }
 
 }
