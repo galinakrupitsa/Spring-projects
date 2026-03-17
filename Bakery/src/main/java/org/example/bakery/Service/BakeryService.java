@@ -26,7 +26,12 @@ public class BakeryService {
         }
         return menu;
     }
-
+    public MenuItem postMenu(MenuResponseDTO menu){
+        MenuItem dtomenu = new MenuItem();
+        dtomenu.setName(menu.getName());
+        dtomenu.setPrice(menu.getPrice());
+        return bakeryRepository.save(dtomenu);
+    }
 
 
 }

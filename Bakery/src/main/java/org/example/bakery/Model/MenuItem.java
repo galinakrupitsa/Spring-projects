@@ -13,6 +13,5 @@ public class MenuItem {
     private Long id;
 
     private String name;
-
     private double price;
 }

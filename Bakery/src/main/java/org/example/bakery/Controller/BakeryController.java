@@ -1,6 +1,7 @@
 package org.example.bakery.Controller;
 
 import org.example.bakery.DTO.MenuResponseDTO;
+import org.example.bakery.Model.MenuItem;
 import org.example.bakery.Service.BakeryService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,5 +18,8 @@ public class BakeryController {
     public List<MenuResponseDTO> getMenu() {
         return bakeryService.showAll();
     }
-
+    @PostMapping("/bakery/add-menu")
+    public MenuItem postMenuItem(@RequestBody MenuResponseDTO menu){
+        return bakeryService.postMenu(menu);
+    }
 }
