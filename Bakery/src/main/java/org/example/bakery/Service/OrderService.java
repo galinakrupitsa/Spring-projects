@@ -223,5 +223,24 @@ public BestDayDTO getBestDay() {
         }
     }
         return new BestDayDTO(bestDate, maxRevenue);
-}
+    }
+
+    public List<CustomerSpendingDTO> getCustomerSpending() {
+        List<Orders> orders = orderRepository.findAll();
+        Map<String, Double> revenuePerDay = new HashMap<>();
+        for (Orders order : orders) {
+            String customerName = order.getCustomer().getName();
+            Double totalSpending = order.getTotal();
+            revenuePerDay.put(customerName,
+                    revenuePerDay.getOrDefault(customerName, 0.0) + totalSpending);
+        }
+        List<CustomerSpendingDTO> result = new ArrayList<>();
+        for (Map.Entry<String, Double> entry : revenuePerDay.entrySet()) {
+            result.add(new CustomerSpendingDTO(
+                    entry.getKey(),
+                    entry.getValue()
+            ));
+        }
+        return result;
+    }
 }

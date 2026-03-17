@@ -58,4 +58,8 @@ public class OrdersController {
     public BestDayDTO getBestDay(){
         return orderService.getBestDay();
     }
+    @GetMapping("/orders/customer-spendings")
+    public List<CustomerSpendingDTO> getCustomerSpendings(){
+        return orderService.getCustomerSpending();
+    }
 }
