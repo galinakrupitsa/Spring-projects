@@ -1,9 +1,12 @@
 package org.example.bakery.Service;
 
+import org.apache.coyote.BadRequestException;
 import org.example.bakery.DTO.ItemsDTO;
+import org.example.bakery.DTO.StoreAddDTO;
 import org.example.bakery.DTO.StoreItemDTO;
 import org.example.bakery.Exception.ItemNotFoundException;
 import org.example.bakery.Exception.NotEnoughStockException;
+import org.example.bakery.Model.MenuItem;
 import org.example.bakery.Model.Store;
 import org.example.bakery.Repository.BakeryRepository;
 import org.example.bakery.Repository.OrderRepository;
@@ -50,5 +53,15 @@ public class StoreService {
             }
         }
         return result;
+    }
+    public String addStore(StoreAddDTO dto) {
+        Store store = storeRepository.findByItemId(dto.getId());
+        if(store == null){
+            throw new ItemNotFoundException("MenuItem" + dto.getId() + " not found");
+        }
+        store.setAvailableQuantity(store.getAvailableQuantity() + dto.getQuantity());
+        storeRepository.save(store);
+        String itemName = store.getItem().getName();
+        return "Успешно добавлено " + itemName;
     }
 }

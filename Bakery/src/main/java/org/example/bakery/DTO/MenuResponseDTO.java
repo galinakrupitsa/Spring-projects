@@ -8,5 +8,6 @@ import lombok.Setter;
 public class MenuResponseDTO {
     public String name;
     public double price;
+    public int quantity;
 }
 

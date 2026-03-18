@@ -1,6 +1,7 @@
 package org.example.bakery.Controller;
 
 import org.example.bakery.DTO.MenuResponseDTO;
+import org.example.bakery.DTO.MenuUpdateDTO;
 import org.example.bakery.Model.MenuItem;
 import org.example.bakery.Service.BakeryService;
 import org.springframework.web.bind.annotation.*;
@@ -21,5 +22,9 @@ public class BakeryController {
     @PostMapping("/bakery/add-menu")
     public MenuItem postMenuItem(@RequestBody MenuResponseDTO menu){
         return bakeryService.postMenu(menu);
+    }
+    @PutMapping("/bakery/update/{id}/price")
+    public MenuUpdateDTO updateMenuItem(@PathVariable Long id, @RequestParam double price){
+        return bakeryService.updateMenuPrice(id,price);
     }
 }

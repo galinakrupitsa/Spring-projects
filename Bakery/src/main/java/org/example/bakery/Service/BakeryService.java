@@ -1,8 +1,12 @@
 package org.example.bakery.Service;
 
 import jakarta.persistence.criteria.Order;
+import jakarta.transaction.Transactional;
 import org.example.bakery.DTO.MenuResponseDTO;
+import org.example.bakery.DTO.MenuUpdateDTO;
+import org.example.bakery.Model.Store;
 import org.example.bakery.Repository.BakeryRepository;
+import org.example.bakery.Repository.StoreRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,8 +16,10 @@ import org.example.bakery.Model.MenuItem;
 @Service
 public class BakeryService {
     private BakeryRepository bakeryRepository;
-    public BakeryService(BakeryRepository bakeryRepository) {
+    private StoreRepository storeRepository;
+    public BakeryService(BakeryRepository bakeryRepository, StoreRepository storeRepository) {
         this.bakeryRepository = bakeryRepository;
+        this.storeRepository = storeRepository;
     }
 
     public List<MenuResponseDTO> showAll() {
@@ -26,12 +32,31 @@ public class BakeryService {
         }
         return menu;
     }
+    @Transactional
     public MenuItem postMenu(MenuResponseDTO menu){
-        MenuItem dtomenu = new MenuItem();
-        dtomenu.setName(menu.getName());
-        dtomenu.setPrice(menu.getPrice());
-        return bakeryRepository.save(dtomenu);
-    }
+        MenuItem item = new MenuItem();
+        item.setName(menu.getName());
+        item.setPrice(menu.getPrice());
+        MenuItem savedItem = bakeryRepository.save(item);
+        Store store = new Store();
+        store.setItem(savedItem);
+        store.setAvailableQuantity(menu.getQuantity());
 
+        storeRepository.save(store);
+        return savedItem;
+    }
+    public MenuUpdateDTO updateMenuPrice(Long id, double price){
+        MenuItem item = bakeryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Товар не найден"));
+
+        item.setPrice(price);
+        bakeryRepository.save(item);
+
+        MenuUpdateDTO menuUpdateDTO = new MenuUpdateDTO();
+        menuUpdateDTO.setName(item.getName());
+        menuUpdateDTO.setPrice(item.getPrice());
+
+        return menuUpdateDTO;
+    }
 
 }

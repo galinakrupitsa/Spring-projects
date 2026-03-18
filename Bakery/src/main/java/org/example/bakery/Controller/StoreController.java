@@ -1,13 +1,11 @@
 package org.example.bakery.Controller;
 
 import org.example.bakery.DTO.ItemsDTO;
+import org.example.bakery.DTO.StoreAddDTO;
 import org.example.bakery.DTO.StoreItemDTO;
 import org.example.bakery.Model.Store;
 import org.example.bakery.Service.StoreService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,5 +27,9 @@ public class StoreController {
     @GetMapping("/store/lowstock")
     public List<ItemsDTO> findByLowStock(){
         return storeService.getLowStock();
+    }
+    @PostMapping("/store/add")
+    public String addStore(@RequestBody StoreAddDTO dto){
+        return storeService.addStore(dto);
     }
 }
