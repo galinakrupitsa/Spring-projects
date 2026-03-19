@@ -1,5 +1,6 @@
 package org.example.bakery.Service;
 
+import jakarta.transaction.Transactional;
 import org.apache.coyote.BadRequestException;
 import org.example.bakery.DTO.ItemsDTO;
 import org.example.bakery.DTO.StoreAddDTO;
@@ -66,8 +67,8 @@ public class StoreService {
         String itemName = store.getItem().getName();
         return "Успешно добавлено " + itemName;
     }
+    @Transactional
     public String addBatch(List<StoreAddDTO> list) {
-
         for (StoreAddDTO dto : list) {
             MenuItem item = bakeryRepository.findById(dto.getId())
                     .orElseThrow(() -> new RuntimeException(
