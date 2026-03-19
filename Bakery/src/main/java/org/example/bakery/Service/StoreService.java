@@ -19,9 +19,11 @@ import java.util.List;
 @Service
 public class StoreService {
     private StoreRepository storeRepository;
+    private BakeryRepository bakeryRepository;
 
     public StoreService(StoreRepository storeRepository, OrderRepository orderRepository, BakeryRepository bakeryRepository) {
         this.storeRepository = storeRepository;
+        this.bakeryRepository = bakeryRepository;
     }
    public List<Store> showAll(){
         return storeRepository.findAllWithItems();
@@ -63,5 +65,24 @@ public class StoreService {
         storeRepository.save(store);
         String itemName = store.getItem().getName();
         return "Успешно добавлено " + itemName;
+    }
+    public String addBatch(List<StoreAddDTO> list) {
+
+        for (StoreAddDTO dto : list) {
+            MenuItem item = bakeryRepository.findById(dto.getId())
+                    .orElseThrow(() -> new RuntimeException(
+                            "Товар не найден с id: " + dto.getId()
+                    ));
+            Store store = storeRepository.findByItem(item)
+                    .orElse(new Store());
+            if (store == null) {
+                store.setItem(item);
+                store.setAvailableQuantity(dto.getQuantity());
+            }else{
+                store.setAvailableQuantity(store.getAvailableQuantity() + dto.getQuantity());
+            }
+            storeRepository.save(store);
+        }
+        return "Товары успешно добавлены: " + list.size();
     }
 }

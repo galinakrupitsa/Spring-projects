@@ -32,4 +32,9 @@ public class StoreController {
     public String addStore(@RequestBody StoreAddDTO dto){
         return storeService.addStore(dto);
     }
+    @PostMapping ("/store/add-batch")
+    public String addStoreBatch(@RequestBody List<StoreAddDTO> list){
+        storeService.addBatch(list);
+        return "Продукты добавлены";
+    }
 }
