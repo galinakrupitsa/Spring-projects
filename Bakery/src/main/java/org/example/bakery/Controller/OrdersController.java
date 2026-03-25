@@ -62,4 +62,5 @@ public class OrdersController {
     public List<CustomerSpendingDTO> getCustomerSpendings(){
         return orderService.getCustomerSpending();
     }
+
 }

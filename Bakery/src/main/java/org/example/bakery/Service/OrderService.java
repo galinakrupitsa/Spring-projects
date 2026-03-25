@@ -1,8 +1,5 @@
 package org.example.bakery.Service;
-
-import jakarta.persistence.criteria.Order;
 import org.example.bakery.DTO.*;
-
 import org.example.bakery.Exception.ItemNotFoundException;
 import org.example.bakery.Model.Customer;
 import org.example.bakery.Model.MenuItem;
@@ -243,4 +240,5 @@ public BestDayDTO getBestDay() {
         }
         return result;
     }
+
 }
