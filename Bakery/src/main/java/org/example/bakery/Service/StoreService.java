@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.apache.coyote.BadRequestException;
 import org.example.bakery.DTO.ItemsDTO;
 import org.example.bakery.DTO.StoreAddDTO;
+import org.example.bakery.DTO.StoreEventDTO;
 import org.example.bakery.DTO.StoreItemDTO;
 import org.example.bakery.Exception.ItemNotFoundException;
 import org.example.bakery.Exception.NotEnoughStockException;
@@ -69,11 +70,15 @@ public class StoreService {
         storeRepository.save(store);
         String itemName = store.getItem().getName();
 
-        // 🔥 отправка в Kafka
-        String message = " Добавлен товар: " + itemName +
-                ", количество: " + dto.getQuantity();
+        // 🔥 создаём DTO
+        StoreEventDTO event = new StoreEventDTO();
+        event.setItemId(dto.getId());
+        event.setItemName(itemName);
+        event.setQuantity(dto.getQuantity());
+        event.setAction("ADD");
 
-        storeProducer.sendStoreUpdate(message);
+        // 🔥 отправляем в Kafka
+        storeProducer.sendStoreUpdate(event);
         return "Успешно добавлено " + itemName;
 
     }
