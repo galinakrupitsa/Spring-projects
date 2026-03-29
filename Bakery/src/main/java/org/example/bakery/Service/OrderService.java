@@ -12,10 +12,7 @@ import org.example.bakery.Repository.StoreRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class OrderService {
@@ -31,6 +28,10 @@ public class OrderService {
         this.storeRepository = storeRepository;
         this.storeService = storeService;
         this.customerRepository = customerRepository;
+    }
+
+    public Optional<Orders> getById(Long orderId) {
+        return orderRepository.findById(orderId);
     }
 
     public OrderResponseDTO createOrder(OrderDTO dto) {

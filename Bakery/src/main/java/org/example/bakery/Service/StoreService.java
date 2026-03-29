@@ -21,10 +21,13 @@ import java.util.List;
 public class StoreService {
     private StoreRepository storeRepository;
     private BakeryRepository bakeryRepository;
+    private StoreProducer storeProducer;
 
-    public StoreService(StoreRepository storeRepository, OrderRepository orderRepository, BakeryRepository bakeryRepository) {
+    public StoreService(StoreRepository storeRepository, OrderRepository orderRepository, BakeryRepository bakeryRepository, StoreProducer storeProducer) {
         this.storeRepository = storeRepository;
         this.bakeryRepository = bakeryRepository;
+        this.storeProducer = storeProducer;
+
     }
    public List<Store> showAll(){
         return storeRepository.findAllWithItems();
@@ -65,7 +68,14 @@ public class StoreService {
         store.setAvailableQuantity(store.getAvailableQuantity() + dto.getQuantity());
         storeRepository.save(store);
         String itemName = store.getItem().getName();
+
+        // 🔥 отправка в Kafka
+        String message = " Добавлен товар: " + itemName +
+                ", количество: " + dto.getQuantity();
+
+        storeProducer.sendStoreUpdate(message);
         return "Успешно добавлено " + itemName;
+
     }
     @Transactional
     public String addBatch(List<StoreAddDTO> list) {

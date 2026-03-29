@@ -1,12 +1,12 @@
 package org.example.bakery.Service;
 
-import jakarta.persistence.criteria.Order;
 import jakarta.transaction.Transactional;
 import org.example.bakery.DTO.MenuResponseDTO;
 import org.example.bakery.DTO.MenuUpdateDTO;
 import org.example.bakery.Model.Store;
 import org.example.bakery.Repository.BakeryRepository;
 import org.example.bakery.Repository.StoreRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public class BakeryService {
         this.bakeryRepository = bakeryRepository;
         this.storeRepository = storeRepository;
     }
-
+@Cacheable("menu")
     public List<MenuResponseDTO> showAll() {
         List<MenuResponseDTO> menu = new ArrayList<>();
         for (MenuItem item : bakeryRepository.findAll()) {
