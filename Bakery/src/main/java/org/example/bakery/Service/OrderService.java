@@ -71,8 +71,8 @@ public class OrderService {
             item.setQuantity(quantity);   // количество
             double price = menuItem.getPrice();
             if (customer.getGender().equalsIgnoreCase("female") &&
-                    (menuItem.getName().equalsIgnoreCase("Cruassant")) ||
-                    (menuItem.getName().equalsIgnoreCase("americano"))) {
+                    (menuItem.getName().equalsIgnoreCase("Cruassant") ||
+                    menuItem.getName().equalsIgnoreCase("americano"))) {
                 price = 0.5 * price;
             }
 
@@ -204,7 +204,8 @@ public class OrderService {
         }
             return itemsToday;
         }
-public BestDayDTO getBestDay() {
+
+    public BestDayDTO getBestDay() {
     List<Orders> orders = orderRepository.findAll();
     Map<LocalDate, Double> revenuePerDay = new HashMap<>();
     for (Orders order : orders) {
